@@ -226,7 +226,6 @@ void idle() {
     last = steady_clock::now();
     const duration<float> frameTime = last - old;
     float deltaTime = frameTime.count();
-
     updatePhysics(deltaTime);
 
     // tell glut to draw - note this will cap this function at 60 fps
