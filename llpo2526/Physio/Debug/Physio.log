@@ -1,4 +1,0 @@
-﻿  main.cpp
-C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\llpo2526\main.cpp(238,12): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'std::chrono::duration<__int64,std::nano>'
-  Physio.vcxproj -> C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\llpo2526\Debug\Physio.exe
-  0 File(s) copied
