@@ -174,7 +174,7 @@ void drawScene() {
     OPTICK_FRAME("drawScene");
 
     // Draw the side wall
-    GLfloat diffuseMaterial[] = {0.2f, 0.2f, 0.2f, 1.0f};
+    GLfloat diffuseMaterial[] = {0.5f, 0.5f, 0.5f, 1.0f};
     glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuseMaterial);
 
     // Draw the left side wall
@@ -196,6 +196,9 @@ void drawScene() {
 
     // Draw the back wall
     glColor3f(0.5f, 0.5f, 0.5f); // Set the wall color
+    diffuseMaterial[0] = 0.2f; diffuseMaterial[1] = 0.2f; diffuseMaterial[2] = 0.2f; //set material to darker on the back wall
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuseMaterial);
+
     Vec3 backWallV1(minX, 0.0f, minZ);
     Vec3 backWallV2(minX, 50.0f, minZ);
     Vec3 backWallV3(maxX, 50.0f, minZ);
