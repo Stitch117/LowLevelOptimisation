@@ -6,7 +6,6 @@
 #include <cstdlib>
 #include <ctime>
 #include <chrono>
-
 #include "globals.h"
 #include "Vec3.h"
 #include "ColliderObject.h"
@@ -35,11 +34,15 @@ using namespace std::chrono;
 
 
 
-std::list<ColliderObject*> colliders;
+std::vector<ColliderObject*> colliders;
+int clickedBoxIndex = -1;
 
 void initScene(int boxCount, int sphereCount) {
-    for (int i = 0; i < boxCount; ++i) {
-        Box* box = new Box();
+    for (int i = 0; i < boxCount; ++i) 
+    {
+        //use malloc to accurately allocate a piece of memeory
+        Box* boxMemory = (Box*)malloc(sizeof(Box));
+        Box* box = new (boxMemory) Box(); //use placement new instead
 
         // Assign random x, y, and z positions within specified ranges
         box->position.x = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
@@ -60,8 +63,11 @@ void initScene(int boxCount, int sphereCount) {
         colliders.push_back(box);
     }
 
-    for (int i = 0; i < sphereCount; ++i) {
-        Sphere* sphere = new Sphere;
+    for (int i = 0; i < sphereCount; ++i) 
+    {
+        //use malloc to accurately allocate a piece of memeory
+        Sphere* sphereMemory = (Sphere*)malloc(sizeof(Sphere));
+        Sphere* sphere = new (sphereMemory) Sphere(); //use placement new instead
 
         // Assign random x, y, and z positions within specified ranges
         sphere->position.x = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
@@ -256,24 +262,28 @@ void mouse(int button, int state, int x, int y) {
         bool clickedBoxOK = false;
         float minIntersectionDistance = std::numeric_limits<float>::max();
 
-        for (ColliderObject* box : colliders) {
-            if (rayBoxIntersection(cameraPosition, rayDirection, box)) {
+        for (int i = 0; i < colliders.size(); i++)
+        {
+            if (rayBoxIntersection(cameraPosition, rayDirection, colliders[i])) {
                 // Calculate the distance between the camera and the intersected box
-                Vec3 diff = box->position - cameraPosition;
+                Vec3 diff = colliders[i]->position - cameraPosition;
                 float distance = diff.length();
 
                 // Update the clicked box index if this box is closer to the camera
                 if (distance < minIntersectionDistance) {
                     clickedBoxOK = true;
+                    clickedBoxIndex = i;
                     minIntersectionDistance = distance;
                 }
             }
         }
 
         // Remove the clicked box if any
-        if (clickedBoxOK != false) {
-            // TODO
-            //colliders.erase(colliders.begin() + clickedBoxIndex);
+        if (clickedBoxOK != false) 
+        {
+            free(colliders[clickedBoxIndex]);
+            colliders[clickedBoxIndex] = nullptr;
+            colliders.erase(colliders.begin() + clickedBoxIndex);
         }
     }
 }
@@ -287,9 +297,13 @@ void keyboard(unsigned char key, int x, int y) {
             box->velocity.y += impulseMagnitude;
         }
     }
-    else if (key == '1') { // 1
+    else if (key == '0') { // 1
 
         std::cout << "Memory used" << std::endl;
+    }
+    else if (key == '1') { // 1
+
+        initScene(NUMBER_OF_BOXES, NUMBER_OF_SPHERES);
     }
 }
 
