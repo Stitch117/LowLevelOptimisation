@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <GL/glut.h>
-#include <list>
 #include <iostream>
 
 #include <cstdlib>
@@ -21,7 +20,6 @@ using namespace std::chrono;
 #define NUMBER_OF_SPHERES 50
 
 // these is where the camera is, where it is looking and the bounds of the continaing box. You shouldn't need to alter these
-
 #define LOOKAT_X 10
 #define LOOKAT_Y 10
 #define LOOKAT_Z 50
