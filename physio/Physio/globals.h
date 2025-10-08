@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <thread>
 
 #define minX -10.0f
 #define maxX 30.0f

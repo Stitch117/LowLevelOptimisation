@@ -33,7 +33,85 @@ using namespace std::chrono;
 
 
 std::vector<ColliderObject*> colliders;
+std::vector<ColliderObject*> LeftBackcolliders;
+std::vector<ColliderObject*> RightBackcolliders;
+std::vector<ColliderObject*> LeftFrontcolliders;
+std::vector<ColliderObject*> RightFrontcolliders;
 int clickedBoxIndex = -1;
+
+
+//thread functions
+void organiseVectors(std::vector<ColliderObject*> _colliders, int threadNumber)
+{
+    if (threadNumber == 1)
+    {
+        for (int i = 0; i < _colliders.size() / 2; i++)
+        {
+            ColliderObject* obj = _colliders[i];
+            const float x = obj->position.x;
+            const float z = obj->position.z;
+
+            // X region
+            const bool isLeft = x < 9.5f;
+            const bool isRight = x > 10.5f;
+            const bool isMidX = !(isLeft || isRight);
+
+            // Z region
+            const bool isBack = z < -0.5f;
+            const bool isFront = z > 0.5f;
+            const bool isMidZ = !(isBack || isFront);
+
+            // Left-side regions
+            if (isLeft || isMidX) 
+            {
+                if (isBack || isMidZ) LeftBackcolliders.push_back(obj);
+                if (isFront || isMidZ) LeftFrontcolliders.push_back(obj);
+            }
+
+            // Right-side regions
+            if (isRight || isMidX) 
+            {
+                if (isBack || isMidZ) RightBackcolliders.push_back(obj);
+                if (isFront || isMidZ) RightFrontcolliders.push_back(obj);
+            }
+        }
+    }
+    else if (threadNumber == 2)
+    {
+        for (int i = _colliders.size() / 2; i < _colliders.size(); i++)
+        {
+            ColliderObject* obj = _colliders[i];
+            const float x = obj->position.x;
+            const float z = obj->position.z;
+
+            // X region
+            const bool isLeft = x < 9.5f;
+            const bool isRight = x > 10.5f;
+            const bool isMidX = !(isLeft || isRight);
+
+            // Z region
+            const bool isBack = z < -0.5f;
+            const bool isFront = z > 0.5f;
+            const bool isMidZ = !(isBack || isFront);
+
+            // Left-side regions
+            if (isLeft || isMidX)
+            {
+                if (isBack || isMidZ) LeftBackcolliders.push_back(obj);
+                if (isFront || isMidZ) LeftFrontcolliders.push_back(obj);
+            }
+
+            // Right-side regions
+            if (isRight || isMidX)
+            {
+                if (isBack || isMidZ) RightBackcolliders.push_back(obj);
+                if (isFront || isMidZ) RightFrontcolliders.push_back(obj);
+            }
+        }
+    }
+}
+
+
 
 void initScene(int boxCount, int sphereCount) {
     for (int i = 0; i < boxCount; ++i) 
@@ -144,7 +222,7 @@ Vec3 screenToWorld(int x, int y) {
 
 
 // update the physics: gravity, collision test, collision resolution
-void updatePhysics(const float deltaTime) {
+void updatePhysics(const float deltaTime, std::vector<ColliderObject*> _colliders) {
     
     // todo for the assessment - use a thread for each sub region
     // for example, assuming we have two regions:
@@ -153,9 +231,9 @@ void updatePhysics(const float deltaTime) {
     //  and add the pointer to that region's list.
     // Then, run two threads with the code below (changing 'colliders' to be the region's list)
 
-    for (ColliderObject* box : colliders) { 
-        
-        box->update(&colliders, deltaTime);
+    for (int i = 0; i < _colliders.size(); i++)
+    {
+        _colliders[i]->update(&_colliders, deltaTime);
         
     }
 }
@@ -236,7 +314,26 @@ void idle() {
     const duration<float> frameTime = last - old;
     float deltaTime = frameTime.count();
 
-    updatePhysics(deltaTime);
+    std::thread threadSort1(organiseVectors, colliders, 1);
+    std::thread threadSort2(organiseVectors, colliders, 2);
+
+    threadSort1.join();
+    threadSort2.join();
+
+    std::thread threadLeftBack(updatePhysics, deltaTime, LeftBackcolliders);
+    std::thread threadRightBack(updatePhysics, deltaTime, RightBackcolliders);
+    std::thread threadLeftFront(updatePhysics, deltaTime, LeftFrontcolliders);
+    std::thread threadRightFront(updatePhysics, deltaTime, RightFrontcolliders);
+
+    threadLeftBack.join();
+    threadRightBack.join();
+    threadLeftFront.join();
+    threadRightFront.join();
+
+    LeftBackcolliders.clear();
+    RightBackcolliders.clear();
+    LeftFrontcolliders.clear();
+    RightFrontcolliders.clear();
 
     // tell glut to draw - note this will cap this function at 60 fps
     glutPostRedisplay();
