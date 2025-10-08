@@ -313,6 +313,7 @@ void idle() {
     last = steady_clock::now();
     const duration<float> frameTime = last - old;
     float deltaTime = frameTime.count();
+    auto start = std::chrono::steady_clock::now();
 
     std::thread threadSort1(organiseVectors, colliders, 1);
     std::thread threadSort2(organiseVectors, colliders, 2);
@@ -334,6 +335,13 @@ void idle() {
     RightBackcolliders.clear();
     LeftFrontcolliders.clear();
     RightFrontcolliders.clear();
+
+    auto end = std::chrono::steady_clock::now();
+    double difference = std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
+    std::cout << difference << "\n";
+
+    float FPS = 1.0f / difference;
+    std::cout << FPS << "\n";
 
     // tell glut to draw - note this will cap this function at 60 fps
     glutPostRedisplay();
