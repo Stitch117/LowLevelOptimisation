@@ -15,8 +15,7 @@ public:
 
     // if two colliders collide, push them away from each other
     void resolveCollision(ColliderObject* a, ColliderObject* b) {
-        Vec3 normal = { a->position.x - b->position.x, a->position.y - b->position.y, a->position.z - b->position.z };
-        float length = std::sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
+        Vec3 normal = { a->position - b->position};
 
         // Normalize the normal vector
         normal.normalise();
@@ -32,7 +31,7 @@ public:
         if (impulse > 0) {
             return;
         }
-
+        
         // Compute the collision impulse scalar
         float e = 0.01f; // Coefficient of restitution (0 = inelastic, 1 = elastic)
         float dampening = 0.9f; // Dampening factor (0.9 = 10% energy reduction)
@@ -72,7 +71,6 @@ public:
 
     void update(std::vector<ColliderObject*>* colliders, const float& deltaTime)
     {
-        const float floorY = 0.0f;
         // Update velocity due to gravity
         velocity.y += gravity * deltaTime;
 
@@ -82,8 +80,15 @@ public:
         position.z += velocity.z * deltaTime;
 
         // Check for collision with the floor
-        if (position.y - size.y / 2.0f < floorY) {
-            position.y = floorY + size.y / 2.0f;
+        if (position.y - size.y / 2.0f < FLOORY) {
+            position.y = FLOORY + size.y / 2.0f;
+            float dampening = 0.7f;
+            velocity.y = -velocity.y * dampening;
+        }
+
+        // Check for collision with the cieling
+        if (position.y + size.y / 2.0f > CIELINGY) {
+            position.y = CIELINGY + size.y / 2.0f;
             float dampening = 0.7f;
             velocity.y = -velocity.y * dampening;
         }

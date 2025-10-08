@@ -29,86 +29,68 @@ using namespace std::chrono;
 #define LOOKDIR_Z 0
 
 
+//Oct tree regions
+struct region
+{
+    Vec3 minRegionX;
+    Vec3 maxRegionx;
+};
 
+bool acceptedRegionCount = false;
+int regionCount = 0;
 
-
+//vector of all the colliders
 std::vector<ColliderObject*> colliders;
-std::vector<ColliderObject*> LeftBackcolliders;
-std::vector<ColliderObject*> RightBackcolliders;
-std::vector<ColliderObject*> LeftFrontcolliders;
-std::vector<ColliderObject*> RightFrontcolliders;
+
+//vector of vectors containing the regions. allows dynamically setting amount of regions wanted 
+std::vector<std::vector<ColliderObject*>> regionColliders;
 int clickedBoxIndex = -1;
 
+std::vector<region> regions;
 
-//thread functions
-void organiseVectors(std::vector<ColliderObject*> _colliders, int threadNumber)
+//create the amouint of regions requested, equally divided along the x axis
+void generateRegions(int _regionCount)
 {
-    if (threadNumber == 1)
+    float width = (maxX - minX) / static_cast<float>(regionCount); //width of each region
+
+    //define a region bounding box with the minimum to the maximum
+    for (int i = 0; i < regionCount; i++)
     {
-        for (int i = 0; i < _colliders.size() / 2; i++)
+        region r;
+        r.minRegionX = Vec3(i * width + minX, FLOORY, minZ);
+        r.maxRegionx = Vec3((i + 1) * width + minX, CIELINGY, maxZ);
+        regions.push_back(r);
+    }
+}
+
+//organise each object into its respetive region
+void organiseVectors(std::vector<ColliderObject*> _colliders)
+{
+    for (int i = 0; i < _colliders.size(); i++)
+    {
+        ColliderObject* obj = _colliders[i];
+        const float x = obj->position.x;
+
+        //check if the x co-ordinate of the object is in a region and if so, add to it
+        for (int r = 0; r < regions.size(); r++)
         {
-            ColliderObject* obj = _colliders[i];
-            const float x = obj->position.x;
-            const float z = obj->position.z;
-
-            // X region
-            const bool isLeft = x < 9.5f;
-            const bool isRight = x > 10.5f;
-            const bool isMidX = !(isLeft || isRight);
-
-            // Z region
-            const bool isBack = z < -0.5f;
-            const bool isFront = z > 0.5f;
-            const bool isMidZ = !(isBack || isFront);
-
-            // Left-side regions
-            if (isLeft || isMidX) 
+            if (x >= regions[r].minRegionX.x && x < regions[r].maxRegionx.x)
             {
-                if (isBack || isMidZ) LeftBackcolliders.push_back(obj);
-                if (isFront || isMidZ) LeftFrontcolliders.push_back(obj);
-            }
+                regionColliders[r].push_back(obj);
+                break;
 
-            // Right-side regions
-            if (isRight || isMidX) 
-            {
-                if (isBack || isMidZ) RightBackcolliders.push_back(obj);
-                if (isFront || isMidZ) RightFrontcolliders.push_back(obj);
+                //region checks for edges of boxes to make more accurate simulation on boundries of regions
+                if (x - 0.5f < regions[r].minRegionX.x)
+                {
+                    regionColliders[r - 1].push_back(obj);
+                }
+                if (x + 0.5f > regions[r].maxRegionx.x)
+                {
+                    regionColliders[r + 1].push_back(obj);
+                }
             }
         }
-    }
-    else if (threadNumber == 2)
-    {
-        for (int i = _colliders.size() / 2; i < _colliders.size(); i++)
-        {
-            ColliderObject* obj = _colliders[i];
-            const float x = obj->position.x;
-            const float z = obj->position.z;
-
-            // X region
-            const bool isLeft = x < 9.5f;
-            const bool isRight = x > 10.5f;
-            const bool isMidX = !(isLeft || isRight);
-
-            // Z region
-            const bool isBack = z < -0.5f;
-            const bool isFront = z > 0.5f;
-            const bool isMidZ = !(isBack || isFront);
-
-            // Left-side regions
-            if (isLeft || isMidX)
-            {
-                if (isBack || isMidZ) LeftBackcolliders.push_back(obj);
-                if (isFront || isMidZ) LeftFrontcolliders.push_back(obj);
-            }
-
-            // Right-side regions
-            if (isRight || isMidX)
-            {
-                if (isBack || isMidZ) RightBackcolliders.push_back(obj);
-                if (isFront || isMidZ) RightFrontcolliders.push_back(obj);
-            }
-        }
-    }
+    }    
 }
 
 
@@ -223,7 +205,7 @@ Vec3 screenToWorld(int x, int y) {
 
 // update the physics: gravity, collision test, collision resolution
 void updatePhysics(const float deltaTime, std::vector<ColliderObject*> _colliders) {
-    
+    OPTICK_EVENT();
     // todo for the assessment - use a thread for each sub region
     // for example, assuming we have two regions:
     // from 'colliders' create two separate lists
@@ -308,6 +290,8 @@ void display() {
 // see https://www.opengl.org/resources/libraries/glut/spec3/node63.html#:~:text=glutIdleFunc
 // NOTE this may be capped at 60 fps as we are using glutPostRedisplay(). If you want it to go higher than this, maybe a thread will help here. 
 void idle() {
+    OPTICK_FRAME("update");
+
     static auto last = steady_clock::now();
     auto old = last;
     last = steady_clock::now();
@@ -315,27 +299,30 @@ void idle() {
     float deltaTime = frameTime.count();
     auto start = std::chrono::steady_clock::now();
 
-    std::thread threadSort1(organiseVectors, colliders, 1);
-    std::thread threadSort2(organiseVectors, colliders, 2);
+    //empty the regions of last frame
+    for (int i = 0; i < regionCount; i++)
+    {
+        regionColliders[i].clear();
+    }
 
-    threadSort1.join();
-    threadSort2.join();
+    //assign each object ito the corresponsding physics region
+    organiseVectors(colliders);
 
-    std::thread threadLeftBack(updatePhysics, deltaTime, LeftBackcolliders);
-    std::thread threadRightBack(updatePhysics, deltaTime, RightBackcolliders);
-    std::thread threadLeftFront(updatePhysics, deltaTime, LeftFrontcolliders);
-    std::thread threadRightFront(updatePhysics, deltaTime, RightFrontcolliders);
+    std::vector<std::thread> physicsThreads;
 
-    threadLeftBack.join();
-    threadRightBack.join();
-    threadLeftFront.join();
-    threadRightFront.join();
+    //update the physics
+    for (int i = 0; i < regions.size(); i++)
+    {
+        //emplace is push back but allows for more arguments and dsoesn't duplicate
+        physicsThreads.emplace_back(updatePhysics, deltaTime, std::ref(regionColliders[i]));
+    }
 
-    LeftBackcolliders.clear();
-    RightBackcolliders.clear();
-    LeftFrontcolliders.clear();
-    RightFrontcolliders.clear();
+    for (int i = 0; i < regions.size(); i++)
+    {
+        physicsThreads[i].join();
+    }
 
+    //diagnostic data
     auto end = std::chrono::steady_clock::now();
     double difference = std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
     std::cout << difference << "\n";
@@ -429,6 +416,36 @@ int main(int argc, char** argv) {
     glLoadIdentity();
     gluPerspective(45.0, 800.0 / 600.0, 0.1, 100.0);
     glMatrixMode(GL_MODELVIEW);
+
+    //ask for anmount of regions
+    while (acceptedRegionCount != true)
+    {
+        std::cout << "Enter number of regions to a power of 2 (2, 4, 8, 16...) \n";
+        std::cin >> regionCount;
+        if (regionCount < 1)
+        {
+            std::cout << "Can't be smaller than one so defaulting to 1\n";
+            regionCount = 1;
+            acceptedRegionCount;
+            break;
+        }
+
+        float tempLogAmount = log2(regionCount);
+        if (ceil(tempLogAmount) == floor(tempLogAmount))
+        {
+            std::cout << "accepted amount of: " << regionCount << "\n";
+            acceptedRegionCount = true;
+        }
+        else
+        {
+            std::cout << "That is not a power of two. Please try again\n";
+        }
+    }
+
+    //create the regions
+    regionColliders.resize(regionCount);
+    generateRegions(regionCount);
+
 
     initScene(NUMBER_OF_BOXES, NUMBER_OF_SPHERES);
     glutDisplayFunc(display);
