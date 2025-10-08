@@ -430,6 +430,7 @@ int main(int argc, char** argv) {
             break;
         }
 
+        //if a number is a power of 2 then log2(n) should return a whole number, so cieling and floor should return the same number
         float tempLogAmount = log2(regionCount);
         if (ceil(tempLogAmount) == floor(tempLogAmount))
         {
