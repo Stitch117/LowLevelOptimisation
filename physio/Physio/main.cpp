@@ -12,6 +12,12 @@
 #include "Sphere.h"
 #include "optick.h"
 
+// includes for the thread pool
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+#include <functional>
+
 
 using namespace std::chrono;
 
@@ -48,6 +54,14 @@ int clickedBoxIndex = -1;
 
 std::vector<region> regions;
 
+//thread pool variables
+std::vector<std::thread> workers; //vector of threads (the thread pool)
+std::queue<std::function<void()>> tasks; //the tasks that the threads will be taking from
+std::mutex queueMutex; //used to lock tasks so only one thread can access it
+std::condition_variable cv; 
+bool stopThreads = false;
+
+
 //create the amouint of regions requested, equally divided along the x axis
 void generateRegions(int _regionCount)
 {
@@ -74,7 +88,15 @@ void organiseVectors(std::vector<ColliderObject*> _colliders)
         //check if the x co-ordinate of the object is in a region and if so, add to it
         for (int r = 0; r < regions.size(); r++)
         {
-            if (x >= regions[r].minRegionX.x && x < regions[r].maxRegionx.x)
+            if (x < regions[0].minRegionX.x)
+            {
+                regionColliders[0].push_back(obj);
+            }
+            else if (x > regions[regions.size() - 1].maxRegionx.x)
+            {
+                regionColliders[regions.size() - 1].push_back(obj); 
+            }
+            else if (x >= regions[r].minRegionX.x && x < regions[r].maxRegionx.x)
             {
                 regionColliders[r].push_back(obj);
                 break;
@@ -205,7 +227,9 @@ Vec3 screenToWorld(int x, int y) {
 
 // update the physics: gravity, collision test, collision resolution
 void updatePhysics(const float deltaTime, std::vector<ColliderObject*> _colliders) {
-    OPTICK_EVENT();
+    OPTICK_THREAD();
+
+
     // todo for the assessment - use a thread for each sub region
     // for example, assuming we have two regions:
     // from 'colliders' create two separate lists
@@ -308,18 +332,25 @@ void idle() {
     //assign each object ito the corresponsding physics region
     organiseVectors(colliders);
 
-    std::vector<std::thread> physicsThreads;
-
-    //update the physics
-    for (int i = 0; i < regions.size(); i++)
-    {
-        //emplace is push back but allows for more arguments and dsoesn't duplicate
-        physicsThreads.emplace_back(updatePhysics, deltaTime, std::ref(regionColliders[i]));
+    //assign the task queue the physics updates
+    { //{} are used to tell when to unlock the queueMutex
+        std::unique_lock<std::mutex> lock(queueMutex);
+        for (int i = 0; i < regions.size(); i++)
+        {
+            tasks.push([=]() { updatePhysics(deltaTime, regionColliders[i]); });
+        }
     }
+    
+    cv.notify_all(); //tell the thread pool there is a task
 
-    for (int i = 0; i < regions.size(); i++)
+    //check and wait until all tasks are done
+    bool done = false;
+    while (!done)
     {
-        physicsThreads[i].join();
+        std::unique_lock<std::mutex> lock(queueMutex);
+        done = tasks.empty(); // wait until all tasks are finished
+        lock.unlock();
+        std::this_thread::yield(); // stops the CPU fo ra bit to let the threads keep working before locking the task queue again
     }
 
     //diagnostic data
@@ -446,6 +477,33 @@ int main(int argc, char** argv) {
     //create the regions
     regionColliders.resize(regionCount);
     generateRegions(regionCount);
+
+    //create the thread pool
+    for (int i = 0; i < regionCount; ++i) //One thread per region
+    {
+        //lamda function so it can run any task
+        workers.emplace_back([]() {
+            while (true)
+            {
+                std::function<void()> task; //holds the task of the thread
+                {
+                    //locks the task when started so two threads can't do same task
+                    std::unique_lock<std::mutex> lock(queueMutex); //unique lock will auto unlock after task is done
+
+                    //thread will sleep until there is eithe ra task or the program closes
+                    cv.wait(lock, [] { return stopThreads || !tasks.empty(); });
+
+                    //thread can exit 
+                    if (stopThreads && tasks.empty())
+                        return;
+
+                    task = std::move(tasks.front()); //gets the first job in the task vector
+                    tasks.pop(); 
+                }
+                task();
+            }
+        });
+    }
 
 
     initScene(NUMBER_OF_BOXES, NUMBER_OF_SPHERES);
