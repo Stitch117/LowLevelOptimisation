@@ -29,11 +29,71 @@ using namespace std::chrono;
 #define LOOKDIR_Z 0
 
 
+//Oct tree regions
+struct region
+{
+    Vec3 minRegionX;
+    Vec3 maxRegionx;
+};
 
+bool acceptedRegionCount = false;
+int regionCount = 0;
 
-
+//vector of all the colliders
 std::vector<ColliderObject*> colliders;
+
+//vector of vectors containing the regions. allows dynamically setting amount of regions wanted 
+std::vector<std::vector<ColliderObject*>> regionColliders;
 int clickedBoxIndex = -1;
+
+std::vector<region> regions;
+
+//create the amouint of regions requested, equally divided along the x axis
+void generateRegions(int _regionCount)
+{
+    float width = (maxX - minX) / static_cast<float>(regionCount); //width of each region
+
+    //define a region bounding box with the minimum to the maximum
+    for (int i = 0; i < regionCount; i++)
+    {
+        region r;
+        r.minRegionX = Vec3(i * width + minX, FLOORY, minZ);
+        r.maxRegionx = Vec3((i + 1) * width + minX, CIELINGY, maxZ);
+        regions.push_back(r);
+    }
+}
+
+//organise each object into its respetive region
+void organiseVectors(std::vector<ColliderObject*> _colliders)
+{
+    for (int i = 0; i < _colliders.size(); i++)
+    {
+        ColliderObject* obj = _colliders[i];
+        const float x = obj->position.x;
+
+        //check if the x co-ordinate of the object is in a region and if so, add to it
+        for (int r = 0; r < regions.size(); r++)
+        {
+            if (x >= regions[r].minRegionX.x && x < regions[r].maxRegionx.x)
+            {
+                regionColliders[r].push_back(obj);
+                break;
+
+                //region checks for edges of boxes to make more accurate simulation on boundries of regions
+                if (x - 0.5f < regions[r].minRegionX.x)
+                {
+                    regionColliders[r - 1].push_back(obj);
+                }
+                if (x + 0.5f > regions[r].maxRegionx.x)
+                {
+                    regionColliders[r + 1].push_back(obj);
+                }
+            }
+        }
+    }    
+}
+
+
 
 void initScene(int boxCount, int sphereCount) {
     for (int i = 0; i < boxCount; ++i) 
@@ -144,8 +204,8 @@ Vec3 screenToWorld(int x, int y) {
 
 
 // update the physics: gravity, collision test, collision resolution
-void updatePhysics(const float deltaTime) {
-    
+void updatePhysics(const float deltaTime, std::vector<ColliderObject*> _colliders) {
+    OPTICK_EVENT();
     // todo for the assessment - use a thread for each sub region
     // for example, assuming we have two regions:
     // from 'colliders' create two separate lists
@@ -153,9 +213,9 @@ void updatePhysics(const float deltaTime) {
     //  and add the pointer to that region's list.
     // Then, run two threads with the code below (changing 'colliders' to be the region's list)
 
-    for (ColliderObject* box : colliders) { 
-        
-        box->update(&colliders, deltaTime);
+    for (int i = 0; i < _colliders.size(); i++)
+    {
+        _colliders[i]->update(&_colliders, deltaTime);
         
     }
 }
@@ -230,16 +290,49 @@ void display() {
 // see https://www.opengl.org/resources/libraries/glut/spec3/node63.html#:~:text=glutIdleFunc
 // NOTE this may be capped at 60 fps as we are using glutPostRedisplay(). If you want it to go higher than this, maybe a thread will help here. 
 void idle() {
+    OPTICK_FRAME("update");
+
     static auto last = steady_clock::now();
     auto old = last;
     last = steady_clock::now();
     const duration<float> frameTime = last - old;
     float deltaTime = frameTime.count();
+    auto start = std::chrono::steady_clock::now();
 
-    updatePhysics(deltaTime);
+    //empty the regions of last frame
+    for (int i = 0; i < regionCount; i++)
+    {
+        regionColliders[i].clear();
+    }
+
+    //assign each object ito the corresponsding physics region
+    organiseVectors(colliders);
+
+    std::vector<std::thread> physicsThreads;
+
+    //update the physics
+    for (int i = 0; i < regions.size(); i++)
+    {
+        //emplace is push back but allows for more arguments and dsoesn't duplicate
+        physicsThreads.emplace_back(updatePhysics, deltaTime, std::ref(regionColliders[i]));
+    }
+
+    for (int i = 0; i < regions.size(); i++)
+    {
+        physicsThreads[i].join();
+    }
+
 
     // tell glut to draw - note this will cap this function at 60 fps
     glutPostRedisplay();
+    
+    //diagnostic data
+    auto end = std::chrono::steady_clock::now();
+    double difference = std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
+    std::cout << difference << "\n";
+
+    float FPS = 1.0f / difference;
+    std::cout << FPS << "\n";
 }
 
 // called the mouse button is tapped
@@ -324,6 +417,37 @@ int main(int argc, char** argv) {
     glLoadIdentity();
     gluPerspective(45.0, 800.0 / 600.0, 0.1, 100.0);
     glMatrixMode(GL_MODELVIEW);
+
+    //ask for anmount of regions
+    while (acceptedRegionCount != true)
+    {
+        std::cout << "Enter number of regions to a power of 2 (2, 4, 8, 16...) \n";
+        std::cin >> regionCount;
+        if (regionCount < 1)
+        {
+            std::cout << "Can't be smaller than one so defaulting to 1\n";
+            regionCount = 1;
+            acceptedRegionCount;
+            break;
+        }
+
+        //if a number is a power of 2 then log2(n) should return a whole number, so cieling and floor should return the same number
+        float tempLogAmount = log2(regionCount);
+        if (ceil(tempLogAmount) == floor(tempLogAmount))
+        {
+            std::cout << "accepted amount of: " << regionCount << "\n";
+            acceptedRegionCount = true;
+        }
+        else
+        {
+            std::cout << "That is not a power of two. Please try again\n";
+        }
+    }
+
+    //create the regions
+    regionColliders.resize(regionCount);
+    generateRegions(regionCount);
+
 
     initScene(NUMBER_OF_BOXES, NUMBER_OF_SPHERES);
     glutDisplayFunc(display);

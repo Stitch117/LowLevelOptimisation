@@ -1,7 +1,49 @@
-﻿  Box.cpp
-  ColliderObject.cpp
-  Sphere.cpp
-  main.cpp
-  Generating Code...
-  LINK : C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\x64\Debug\Physio.exe not found or not built by the last incremental link; performing full link
-  Physio.vcxproj -> C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\x64\Debug\Physio.exe
+﻿  main.cpp
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(60,47): error C2065: 'FLOORY': undeclared identifier
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(61,53): error C2065: 'CIELINGY': undeclared identifier
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(311,22): error C2039: 'thread': is not a member of 'std'
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.38.33130\include\list(23,1):
+  see declaration of 'std'
+  
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(311,22): error C2065: 'thread': undeclared identifier
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(311,10): error C2923: 'std::vector': 'thread' is not a valid template type argument for parameter '_Ty'
+  C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(311,22):
+  see declaration of 'thread'
+  
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(311,10): error C2976: 'std::vector': too few template arguments
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.38.33130\include\vector(436,1):
+  see declaration of 'std::vector'
+  
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(311,30): error C2133: 'physicsThreads': unknown size
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(311,30): error C2512: 'std::vector': no appropriate default constructor available
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.38.33130\include\vector(436,1):
+  see declaration of 'std::vector'
+  
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(317,23): error C2662: 'decltype(auto) std::vector<_Ty,_Alloc>::emplace_back<void(__cdecl &)(float,std::vector<ColliderObject *,std::allocator<ColliderObject *>>),float&,std::reference_wrapper<_Ty>>(void (__cdecl &)(float,std::vector<ColliderObject *,std::allocator<ColliderObject *>>),float &,std::reference_wrapper<_Ty> &&)': cannot convert 'this' pointer from 'std::vector' to 'std::vector<_Ty,_Alloc> &'
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(317,23): error C2662:         with
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(317,23): error C2662:         [
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(317,23): error C2662:             _Ty=std::vector<ColliderObject *,std::allocator<ColliderObject *>>
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(317,23): error C2662:         ]
+  C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(317,9):
+  Reason: cannot convert from 'std::vector' to 'std::vector<_Ty,_Alloc>'
+  C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(317,9):
+  Conversion requires a second user-defined-conversion operator or constructor
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.38.33130\include\vector(860,33):
+  see declaration of 'std::vector<_Ty,_Alloc>::emplace_back'
+  C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(317,23):
+  while trying to match the argument list '(overloaded-function, float, std::reference_wrapper<_Ty>)'
+          with
+          [
+              _Ty=std::vector<ColliderObject *,std::allocator<ColliderObject *>>
+          ]
+  
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(322,9): error C2678: binary '[': no operator found which takes a left-hand operand of type 'std::vector' (or there is no acceptable conversion)
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.38.33130\include\vector(1900,40):
+  could be 'const _Ty &std::vector<_Ty,_Alloc>::operator [](const allocator_traits<allocator_traits<_Alloc>::rebind_alloc<_Ty>>::size_type) noexcept const'
+  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.38.33130\include\vector(1890,34):
+  or       '_Ty &std::vector<_Ty,_Alloc>::operator [](const allocator_traits<allocator_traits<_Alloc>::rebind_alloc<_Ty>>::size_type) noexcept'
+  C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(322,9):
+  while trying to match the argument list '(std::vector, int)'
+  
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(334,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(435,29): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
