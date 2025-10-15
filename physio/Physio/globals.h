@@ -13,14 +13,34 @@
 // gravity - change it and see what happens (usually negative!)
 const float gravity = -19.81f;
 
-//void* operator new (size_t size)
-//{
-//	char* pMem = (char*)malloc(size);
-//	void* pStartMemBlock = pMem;
-//	return pStartMemBlock;
-//}
-//
-//void operator delete (void* pMem)
-//{
-//	free(pMem);
-//}
+struct Header
+{
+	int size; 
+};
+
+struct Footer
+{
+	int reserved; 
+};
+
+inline void* operator new (size_t size)
+{
+	size_t nRequestedBytes = size + sizeof(Header) + sizeof(Footer);
+	char* pMem = (char*)malloc(nRequestedBytes);
+	Header* pHeader = (Header*)pMem; //pointer to header
+
+	pHeader->size = size;
+
+	void* pFooterAdd = pMem + sizeof(Header); //pointer to footer 
+	Footer* pFooter = (Footer*)pFooterAdd; //cast the pointer
+
+	void* pStartMemBlock = pMem + sizeof(Header);
+	return pStartMemBlock;
+}
+
+inline void operator delete (void* pMem)
+{
+	Header* pHeader = (Header*)((char*)pMem - sizeof(Header));
+	Footer* pFooter = (Footer*)((char*)pMem + pHeader->size);
+	free(pHeader);
+}

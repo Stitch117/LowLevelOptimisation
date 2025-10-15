@@ -120,9 +120,8 @@ void organiseVectors(std::vector<ColliderObject*> _colliders)
 void initScene(int boxCount, int sphereCount) {
     for (int i = 0; i < boxCount; ++i) 
     {
-        //use malloc to accurately allocate a piece of memeory
-        Box* boxMemory = (Box*)malloc(sizeof(Box));
-        Box* box = new (boxMemory) Box(); //use placement new instead
+        //use overide new in crating box
+        Box* box = new Box();
 
         // Assign random x, y, and z positions within specified ranges
         box->position.x = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
@@ -145,9 +144,8 @@ void initScene(int boxCount, int sphereCount) {
 
     for (int i = 0; i < sphereCount; ++i) 
     {
-        //use malloc to accurately allocate a piece of memeory
-        Sphere* sphereMemory = (Sphere*)malloc(sizeof(Sphere));
-        Sphere* sphere = new (sphereMemory) Sphere(); //use placement new instead
+        //use overide new in crating sphere
+        Sphere* sphere = new Sphere(); //use placement new instead
 
         // Assign random x, y, and z positions within specified ranges
         sphere->position.x = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
@@ -228,14 +226,6 @@ Vec3 screenToWorld(int x, int y) {
 // update the physics: gravity, collision test, collision resolution
 void updatePhysics(const float deltaTime, std::vector<ColliderObject*> _colliders) {
     OPTICK_THREAD();
-
-
-    // todo for the assessment - use a thread for each sub region
-    // for example, assuming we have two regions:
-    // from 'colliders' create two separate lists
-    // empty each list (from previous frame) and work out which collidable object is in which region, 
-    //  and add the pointer to that region's list.
-    // Then, run two threads with the code below (changing 'colliders' to be the region's list)
 
     for (int i = 0; i < _colliders.size(); i++)
     {
@@ -402,8 +392,7 @@ void mouse(int button, int state, int x, int y) {
         // Remove the clicked box if any
         if (clickedBoxOK != false) 
         {
-            free(colliders[clickedBoxIndex]);
-            colliders[clickedBoxIndex] = nullptr;
+            delete(colliders[clickedBoxIndex]);
             colliders.erase(colliders.begin() + clickedBoxIndex);
         }
     }

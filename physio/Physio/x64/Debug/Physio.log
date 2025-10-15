@@ -1,7 +1,16 @@
 ﻿  main.cpp
-C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(230,5): warning C4003: not enough arguments for function-like macro invocation 'OPTICK_THREAD'
-C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(230,5): warning C4551: function call missing argument list
-C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(230,5): warning C4930: 'Optick::ThreadScope brofilerThreadScope(void)': prototyped function not called (was a variable definition intended?)
-C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(361,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(465,29): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\globals.h(26,14): warning C4595: 'operator new': non-member operator new or delete functions may not be declared inline
+  (compiling source file 'main.cpp')
+  
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\globals.h(32,18): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'main.cpp')
+  
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\globals.h(41,13): warning C4595: 'operator delete': non-member operator new or delete functions may not be declared inline
+  (compiling source file 'main.cpp')
+  
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(228,5): warning C4003: not enough arguments for function-like macro invocation 'OPTICK_THREAD'
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(228,5): warning C4551: function call missing argument list
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(228,5): warning C4930: 'Optick::ThreadScope brofilerThreadScope(void)': prototyped function not called (was a variable definition intended?)
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(351,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(454,29): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
   Physio.vcxproj -> C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\x64\Debug\Physio.exe
