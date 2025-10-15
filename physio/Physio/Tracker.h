@@ -28,7 +28,7 @@ public:
 	//used to print out current information onm either the cubes or the sphere or the total
 	void printInfo() const
 	{
-		std::cout << "Tracker [" << name << "] "
+		std::cout << "Tracker [" << name << "]\n "
 			<< "Allocated: " << totalAllocated << " bytes, "
 			<< "Freed: " << totalFreed << " bytes, "
 			<< "In Use: " << currentlyUsed << " bytes\n";

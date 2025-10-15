@@ -20,17 +20,21 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Box.cpp" />
+    <ClCompile Include="BoxPool.cpp" />
     <ClCompile Include="ColliderObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Sphere.cpp" />
+    <ClCompile Include="SpherePool.cpp" />
     <ClCompile Include="TrackerManager.cpp" />
     <ClCompile Include="Vec3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Box.h" />
+    <ClInclude Include="BoxPool.h" />
     <ClInclude Include="Callbacks.h" />
     <ClInclude Include="ColliderObject.h" />
     <ClInclude Include="globals.h" />
+    <ClInclude Include="SpherePool.h" />
     <ClInclude Include="TrackerManager.h" />
     <ClInclude Include="Tracker.h" />
     <ClInclude Include="Sphere.h" />

@@ -1,44 +1,33 @@
 #pragma once
 #include "ColliderObject.h"
+#include "SpherePool.h"
+
 class Sphere :
     public ColliderObject
 {
 public:
 	inline void* operator new (size_t size)
 	{
-		size_t nRequestedBytes = size + sizeof(Header) + sizeof(Footer);
-		char* pMem = (char*)malloc(nRequestedBytes);
-		Header* pHeader = (Header*)pMem; //pointer to header
+		void* mem = SpherePool::Get().Allocate(size);  //get a block of memory from the pool
 
-		pHeader->size = size;
+		//if not enough memory space in pool, default to global new function
+		if (!mem)
+		{
+			mem = ::operator new(size);
+		}
 
-		void* pFooterAdd = pMem + sizeof(Header); //pointer to footer 
-		Footer* pFooter = (Footer*)pFooterAdd; //cast the pointer
+		//assign header 
+		Header* h = (Header*)mem;
+		h->size = size;
 
-		//memory tracking data
-		TrackerManager::GetTracker("Global").addAllocations(size);
-		TrackerManager::GetTracker("GlobalWithHeaderAndFooter").addAllocations(nRequestedBytes);
-		TrackerManager::GetTracker("Sphere").addAllocations(size);
-		TrackerManager::GetTracker("SphereWithHeaderAndFooter").addAllocations(nRequestedBytes);
-
-		void* pStartMemBlock = pMem + sizeof(Header);
-		return pStartMemBlock;
+		return (char*)mem + sizeof(Header);
 	}
 
 
 	inline void operator delete (void* pMem)
 	{
-		Header* pHeader = (Header*)((char*)pMem - sizeof(Header));
-		Footer* pFooter = (Footer*)((char*)pMem + pHeader->size);
-
-		//memory tracking data
-		TrackerManager::GetTracker("Global").freeAllocation(pHeader->size);
-		TrackerManager::GetTracker("GlobalWithHeaderAndFooter").freeAllocation(pHeader->size + sizeof(Header) + sizeof(Footer));
-		TrackerManager::GetTracker("Sphere").freeAllocation(pHeader->size);
-		TrackerManager::GetTracker("SphereWithHeaderAndFooter").freeAllocation(pHeader->size + sizeof(Header) + sizeof(Footer));
-
-
-		free(pHeader);
+		Header* h = (Header*)((char*)pMem - sizeof(Header));
+		SpherePool::Get().Free(h);
 	}
 
 

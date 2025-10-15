@@ -12,8 +12,8 @@
 #define CIELINGY 60.0f
 
 // this is the number of falling physical items. 
-#define NUMBER_OF_BOXES 100
-#define NUMBER_OF_SPHERES 100
+#define NUMBER_OF_BOXES 50
+#define NUMBER_OF_SPHERES 50
 
 // gravity - change it and see what happens (usually negative!)
 const float gravity = -19.81f;

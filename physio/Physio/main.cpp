@@ -443,9 +443,13 @@ void keyboard(unsigned char key, int x, int y) {
 
         std::cout << "Current FPS of physics: " << FPS << std::endl;
     }
-    else if (key == '1') { // 1
-
-        initScene(NUMBER_OF_BOXES, NUMBER_OF_SPHERES);
+    else if (key == '1') 
+    // 1
+    {
+        if (numOfBoxes < 1000 || numOfSpheres < 1000)
+        {
+            initScene(NUMBER_OF_BOXES, NUMBER_OF_SPHERES);
+        }
     }
     else if (key == '2')// 2
     { 
@@ -488,6 +492,8 @@ int main(int argc, char** argv) {
     gluPerspective(45.0, 800.0 / 600.0, 0.1, 100.0);
     glMatrixMode(GL_MODELVIEW);
     generateMapTracker();
+    BoxPool::Get(1000); 
+    SpherePool::Get(1000);
 
     //ask for anmount of regions
     while (acceptedRegionCount != true)
