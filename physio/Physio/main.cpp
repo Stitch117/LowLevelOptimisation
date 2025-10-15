@@ -11,6 +11,7 @@
 #include "Box.h"
 #include "Sphere.h"
 #include "optick.h"
+#include "TrackerManager.h"
 
 // includes for the thread pool
 #include <queue>
@@ -20,10 +21,6 @@
 
 
 using namespace std::chrono;
-
-// this is the number of falling physical items. 
-#define NUMBER_OF_BOXES 50
-#define NUMBER_OF_SPHERES 50
 
 // these is where the camera is, where it is looking and the bounds of the continaing box. You shouldn't need to alter these
 #define LOOKAT_X 10
@@ -61,7 +58,14 @@ std::mutex queueMutex; //used to lock tasks so only one thread can access it
 std::condition_variable cv; 
 bool stopThreads = false;
 
+float FPS = 0;
+int numOfBoxes = 0;
+int numOfSpheres = 0;
 
+void printNumOfObjs()
+{
+    std::cout << "Num of Boxes: " << numOfBoxes << " Num of Spheres: " << numOfSpheres << std::endl;
+}
 //create the amouint of regions requested, equally divided along the x axis
 void generateRegions(int _regionCount)
 {
@@ -75,6 +79,12 @@ void generateRegions(int _regionCount)
         r.maxRegionx = Vec3((i + 1) * width + minX, CIELINGY, maxZ);
         regions.push_back(r);
     }
+}
+
+void generateMapTracker()
+{
+    TrackerManager::GetTracker("Global");
+    TrackerManager::GetTracker("GlobalWithHeaderAndFooter");
 }
 
 //organise each object into its respetive region
@@ -117,7 +127,12 @@ void organiseVectors(std::vector<ColliderObject*> _colliders)
 
 
 
-void initScene(int boxCount, int sphereCount) {
+void initScene(int boxCount, int sphereCount) 
+{
+    std::cout << "\nBefore any allocation:\n";
+    TrackerManager::PrintAll();
+    printNumOfObjs();
+
     for (int i = 0; i < boxCount; ++i) 
     {
         //use overide new in crating box
@@ -140,7 +155,12 @@ void initScene(int boxCount, int sphereCount) {
         box->colour.z = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 
         colliders.push_back(box);
+        numOfBoxes++;
     }
+
+    std::cout << "\nafter box allocation:\n";
+    TrackerManager::PrintAll(); 
+    printNumOfObjs();
 
     for (int i = 0; i < sphereCount; ++i) 
     {
@@ -164,7 +184,12 @@ void initScene(int boxCount, int sphereCount) {
         sphere->colour.z = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 
         colliders.push_back(sphere);
+        numOfSpheres++;
     }
+
+    std::cout << "\nafter sphere allocation:\n";
+    TrackerManager::PrintAll();
+    printNumOfObjs();
 }
 
 // a ray which is used to tap (by default, remove) a box - see the 'mouse' function for how this is used.
@@ -346,10 +371,10 @@ void idle() {
     //diagnostic data
     auto end = std::chrono::steady_clock::now();
     double difference = std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
-    std::cout << difference << "\n";
+    //std::cout << difference << "\n";
 
-    float FPS = 1.0f / difference;
-    std::cout << FPS << "\n";
+    FPS = 1.0f / difference;
+    //std::cout << FPS << "\n";
 
     // tell glut to draw - note this will cap this function at 60 fps
     glutPostRedisplay();
@@ -407,13 +432,39 @@ void keyboard(unsigned char key, int x, int y) {
             box->velocity.y += impulseMagnitude;
         }
     }
-    else if (key == '0') { // 1
+    else if (key == '0') 
+    // 0
+    { 
+        std::cout << "Current memory information: \n";
+        TrackerManager::PrintAll();
+        printNumOfObjs();
+    }
+    else if (key == '9') { // 9
 
-        std::cout << "Memory used" << std::endl;
+        std::cout << "Current FPS of physics: " << FPS << std::endl;
     }
     else if (key == '1') { // 1
 
         initScene(NUMBER_OF_BOXES, NUMBER_OF_SPHERES);
+    }
+    else if (key == '2')// 2
+    { 
+        if (colliders.size() > 0)
+        {
+            int tempColSize = colliders.size();
+            //remove the last batch 
+            for (int i = tempColSize - 1; i > tempColSize - NUMBER_OF_BOXES - NUMBER_OF_SPHERES - 1; i--)
+            {
+                ColliderObject* obj = colliders.back(); 
+                colliders.pop_back();
+                delete(obj);
+            }
+            numOfBoxes -= NUMBER_OF_BOXES;
+            numOfSpheres -= NUMBER_OF_SPHERES;
+            std::cout << "\nAfter deleting " << NUMBER_OF_BOXES << " boxes and " << NUMBER_OF_SPHERES << " spheres:\n";
+            TrackerManager::PrintAll(); 
+            printNumOfObjs();
+        }
     }
 }
 
@@ -436,6 +487,7 @@ int main(int argc, char** argv) {
     glLoadIdentity();
     gluPerspective(45.0, 800.0 / 600.0, 0.1, 100.0);
     glMatrixMode(GL_MODELVIEW);
+    generateMapTracker();
 
     //ask for anmount of regions
     while (acceptedRegionCount != true)
@@ -498,6 +550,12 @@ int main(int argc, char** argv) {
     initScene(NUMBER_OF_BOXES, NUMBER_OF_SPHERES);
     glutDisplayFunc(display);
     glutIdleFunc(idle);
+
+    //on exit, clean up the unorered map
+    atexit([]() 
+        { 
+        TrackerManager::Cleanup(); 
+        }); 
 
     // it will stick here until the program ends. 
     glutMainLoop();

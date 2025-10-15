@@ -13,6 +13,8 @@ public:
     Vec3 velocity;
     Vec3 colour;
 
+    virtual ~ColliderObject();
+
     // if two colliders collide, push them away from each other
     void resolveCollision(ColliderObject* a, ColliderObject* b) {
         Vec3 normal = { a->position - b->position};

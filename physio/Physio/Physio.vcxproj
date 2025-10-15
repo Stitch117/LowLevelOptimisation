@@ -23,6 +23,7 @@
     <ClCompile Include="ColliderObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Sphere.cpp" />
+    <ClCompile Include="TrackerManager.cpp" />
     <ClCompile Include="Vec3.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -30,6 +31,8 @@
     <ClInclude Include="Callbacks.h" />
     <ClInclude Include="ColliderObject.h" />
     <ClInclude Include="globals.h" />
+    <ClInclude Include="TrackerManager.h" />
+    <ClInclude Include="Tracker.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Vec3.h" />
   </ItemGroup>
