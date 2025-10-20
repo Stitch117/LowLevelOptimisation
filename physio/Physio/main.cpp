@@ -104,7 +104,7 @@ void organiseVectors(std::vector<ColliderObject*> _colliders)
                 regionColliders[0].push_back(obj);
                 break;
             }
-            else if (x > regions[regions.size() - 1].maxRegionx.x)
+            else if (x >= regions[regions.size() - 1].maxRegionx.x)
             {
                 regionColliders[regions.size() - 1].push_back(obj); 
                 break;
@@ -377,7 +377,7 @@ void idle() {
     double difference = std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
     //std::cout << difference << "\n";
 
-    FPS = difference;
+    FPS = 1.0f / difference;
     //std::cout << FPS << "\n";
 
     // tell glut to draw - note this will cap this function at 60 fps

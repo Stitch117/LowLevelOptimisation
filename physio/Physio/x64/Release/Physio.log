@@ -1,11 +1,11 @@
 ﻿  main.cpp
-C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\Physio\globals.h(34,14): warning C4595: 'operator new': non-member operator new or delete functions may not be declared inline
+C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\Physio\globals.h(36,14): warning C4595: 'operator new': non-member operator new or delete functions may not be declared inline
   (compiling source file 'main.cpp')
   
-C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\Physio\globals.h(40,18): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\Physio\globals.h(42,18): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
   (compiling source file 'main.cpp')
   
-C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\Physio\globals.h(49,13): warning C4595: 'operator delete': non-member operator new or delete functions may not be declared inline
+C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\Physio\globals.h(51,13): warning C4595: 'operator delete': non-member operator new or delete functions may not be declared inline
   (compiling source file 'main.cpp')
   
 C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\Physio\Box.h(21,13): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
@@ -17,11 +17,11 @@ C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\Physio\Sphere.h(2
 C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\Physio\main.cpp(257,5): warning C4003: not enough arguments for function-like macro invocation 'OPTICK_THREAD'
 C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\Physio\main.cpp(257,5): warning C4551: function call missing argument list
 C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\Physio\main.cpp(257,5): warning C4930: 'Optick::ThreadScope brofilerThreadScope(void)': prototyped function not called (was a variable definition intended?)
-C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\Physio\main.cpp(380,11): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\Physio\main.cpp(380,16): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\Physio\main.cpp(470,29): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
 C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\Physio\main.cpp(542,29): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
   Generating code
-  2 of 786 functions ( 0.3%) were compiled, the rest were copied from previous compilation.
+  1 of 786 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     1 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
