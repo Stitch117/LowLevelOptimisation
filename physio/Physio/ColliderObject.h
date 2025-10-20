@@ -19,7 +19,7 @@ public:
         BoxCollider
     };
 
-    int ColliderTypeInt;
+    int ColliderTypeInt = -1;
 
     virtual ~ColliderObject();
 
