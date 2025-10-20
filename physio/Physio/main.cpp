@@ -116,11 +116,11 @@ void organiseVectors(std::vector<ColliderObject*> _colliders)
                 regionColliders[r].push_back(obj);
 
                 //region checks for edges of boxes to make more accurate simulation on boundries of regions
-                if (x - 0.5f < regions[r].minRegionX.x && x > minX + 0.5)
+                if (x - HALF_OBJECT_LENGTH < regions[r].minRegionX.x && x > minX + HALF_OBJECT_LENGTH)
                 {
                     regionColliders[r - 1].push_back(obj);
                 }
-                if (x + 0.5f > regions[r].maxRegionx.x && x <= maxX - 0.5)
+                if (x + HALF_OBJECT_LENGTH > regions[r].maxRegionx.x && x <= maxX - HALF_OBJECT_LENGTH)
                 {
                     regionColliders[r + 1].push_back(obj);
                 }
