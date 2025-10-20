@@ -6,7 +6,7 @@
 class Box : public ColliderObject
 {
 public:
-
+	
 	inline void* operator new (size_t size)
 	{
 		void* mem = BoxPool::Get().Allocate(size);  //get a block of memory from the pool
@@ -16,7 +16,6 @@ public:
 		{
 			mem = ::operator new(size); 
 		}
-
 		//assign header 
 		Header* h = (Header*)mem;
 		h->size = size;
@@ -31,6 +30,10 @@ public:
         BoxPool::Get().Free(h);
 	}
 
+	Box()
+	{
+		ColliderTypeInt = ColliderType::BoxCollider;
+	}
 	void drawMesh() { glutSolidCube(1.0); }
 };
 

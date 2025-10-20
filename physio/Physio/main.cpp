@@ -373,7 +373,7 @@ void idle() {
     double difference = std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
     //std::cout << difference << "\n";
 
-    FPS = 1.0f / difference;
+    FPS = difference;
     //std::cout << FPS << "\n";
 
     // tell glut to draw - note this will cap this function at 60 fps
@@ -419,6 +419,14 @@ void mouse(int button, int state, int x, int y) {
         {
             delete(colliders[clickedBoxIndex]);
             colliders.erase(colliders.begin() + clickedBoxIndex);
+            if (colliders[clickedBoxIndex]->ColliderTypeInt == ColliderObject::ColliderType::BoxCollider)
+            {
+                numOfBoxes--;
+            }
+            else if (colliders[clickedBoxIndex]->ColliderTypeInt == ColliderObject::ColliderType::SphereCollider)
+            {
+                numOfSpheres--;
+            }
         }
     }
 }
@@ -446,7 +454,7 @@ void keyboard(unsigned char key, int x, int y) {
     else if (key == '1') 
     // 1
     {
-        if (numOfBoxes < 1000 || numOfSpheres < 1000)
+        if (numOfBoxes <= MAX_NUMBER_BOXES - NUMBER_OF_BOXES && numOfSpheres <= MAX_NUMBER_SPHERES - NUMBER_OF_SPHERES)
         {
             initScene(NUMBER_OF_BOXES, NUMBER_OF_SPHERES);
         }
@@ -456,16 +464,34 @@ void keyboard(unsigned char key, int x, int y) {
         if (colliders.size() > 0)
         {
             int tempColSize = colliders.size();
-            //remove the last batch 
-            for (int i = tempColSize - 1; i > tempColSize - NUMBER_OF_BOXES - NUMBER_OF_SPHERES - 1; i--)
+
+            //check if enough objs to delete
+            if (tempColSize < NUMBER_OF_BOXES + NUMBER_OF_SPHERES)
             {
-                ColliderObject* obj = colliders.back(); 
-                colliders.pop_back();
-                delete(obj);
+                //remove the last batch 
+                for (int i = tempColSize - 1; i > -1; i--)
+                {
+                    ColliderObject* obj = colliders.back();
+                    colliders.pop_back();
+                    delete(obj);
+                }
+                numOfBoxes = 0;
+                numOfSpheres = 0;
+                std::cout << "\nAfter removing all remainin objects:\n";
             }
-            numOfBoxes -= NUMBER_OF_BOXES;
-            numOfSpheres -= NUMBER_OF_SPHERES;
-            std::cout << "\nAfter deleting " << NUMBER_OF_BOXES << " boxes and " << NUMBER_OF_SPHERES << " spheres:\n";
+            else
+            {
+                //remove the last batch 
+                for (int i = tempColSize - 1; i > tempColSize - NUMBER_OF_BOXES - NUMBER_OF_SPHERES - 1; i--)
+                {
+                    ColliderObject* obj = colliders.back();
+                    colliders.pop_back();
+                    delete(obj);
+                }
+                numOfBoxes -= NUMBER_OF_BOXES;
+                numOfSpheres -= NUMBER_OF_SPHERES;
+                std::cout << "\nAfter deleting " << NUMBER_OF_BOXES << " boxes and " << NUMBER_OF_SPHERES << " spheres:\n";
+            }
             TrackerManager::PrintAll(); 
             printNumOfObjs();
         }
@@ -492,8 +518,8 @@ int main(int argc, char** argv) {
     gluPerspective(45.0, 800.0 / 600.0, 0.1, 100.0);
     glMatrixMode(GL_MODELVIEW);
     generateMapTracker();
-    BoxPool::Get(1000); 
-    SpherePool::Get(1000);
+    BoxPool::Get(MAX_NUMBER_BOXES); 
+    SpherePool::Get(MAX_NUMBER_SPHERES);
 
     //ask for anmount of regions
     while (acceptedRegionCount != true)
@@ -526,7 +552,7 @@ int main(int argc, char** argv) {
     generateRegions(regionCount);
 
     //create the thread pool
-    for (int i = 0; i < regionCount; ++i) //One thread per region
+    for (int i = 0; i < regionCount; i++) //One thread per region
     {
         //lamda function so it can run any task
         workers.emplace_back([]() {

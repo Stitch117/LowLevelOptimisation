@@ -15,6 +15,9 @@
 #define NUMBER_OF_BOXES 50
 #define NUMBER_OF_SPHERES 50
 
+#define MAX_NUMBER_BOXES 5000
+#define MAX_NUMBER_SPHERES 5000
+
 // gravity - change it and see what happens (usually negative!)
 const float gravity = -19.81f;
 

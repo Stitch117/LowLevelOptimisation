@@ -30,6 +30,10 @@ public:
 		SpherePool::Get().Free(h);
 	}
 
+	Sphere()
+	{
+		ColliderTypeInt = ColliderType::SphereCollider;
+	}
 
     void drawMesh() { glutSolidSphere(0.5, 5, 5); }
 }; 
