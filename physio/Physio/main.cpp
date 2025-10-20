@@ -69,10 +69,10 @@ void printNumOfObjs()
 //create the amouint of regions requested, equally divided along the x axis
 void generateRegions(int _regionCount)
 {
-    float width = (maxX - minX) / static_cast<float>(regionCount); //width of each region
+    float width = (maxX - minX) / static_cast<float>(_regionCount); //width of each region
 
     //define a region bounding box with the minimum to the maximum
-    for (int i = 0; i < regionCount; i++)
+    for (int i = 0; i < _regionCount; i++)
     {
         region r;
         r.minRegionX = Vec3(i * width + minX, FLOORY, minZ);
@@ -98,25 +98,29 @@ void organiseVectors(std::vector<ColliderObject*> _colliders)
         //check if the x co-ordinate of the object is in a region and if so, add to it
         for (int r = 0; r < regions.size(); r++)
         {
+            //edge cases on the outside walls
             if (x < regions[0].minRegionX.x)
             {
                 regionColliders[0].push_back(obj);
+                break;
             }
             else if (x > regions[regions.size() - 1].maxRegionx.x)
             {
                 regionColliders[regions.size() - 1].push_back(obj); 
+                break;
             }
+
+            //internal collision checks
             else if (x >= regions[r].minRegionX.x && x < regions[r].maxRegionx.x)
             {
                 regionColliders[r].push_back(obj);
-                break;
 
                 //region checks for edges of boxes to make more accurate simulation on boundries of regions
-                if (x - 0.5f < regions[r].minRegionX.x)
+                if (x - 0.5f < regions[r].minRegionX.x && x > minX + 0.5)
                 {
                     regionColliders[r - 1].push_back(obj);
                 }
-                if (x + 0.5f > regions[r].maxRegionx.x)
+                if (x + 0.5f > regions[r].maxRegionx.x && x <= maxX - 0.5)
                 {
                     regionColliders[r + 1].push_back(obj);
                 }
