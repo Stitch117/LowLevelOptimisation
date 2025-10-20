@@ -120,10 +120,12 @@ void organiseVectors(std::vector<ColliderObject*> _colliders)
                 {
                     regionColliders[r - 1].push_back(obj);
                 }
-                if (x + HALF_OBJECT_LENGTH > regions[r].maxRegionx.x && x <= maxX - HALF_OBJECT_LENGTH)
+                if (x + HALF_OBJECT_LENGTH > regions[r].maxRegionx.x && x < maxX - HALF_OBJECT_LENGTH)
                 {
                     regionColliders[r + 1].push_back(obj);
                 }
+
+                break;
             }
         }
     }    
