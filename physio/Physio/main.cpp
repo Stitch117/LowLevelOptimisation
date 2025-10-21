@@ -370,17 +370,15 @@ void idle() {
         std::unique_lock<std::mutex> lock(queueMutex);
         done = tasks.empty(); // wait until all tasks are finished
         lock.unlock();
-        std::this_thread::yield(); // stops the CPU fo ra bit to let the threads keep working before locking the task queue again
+        std::this_thread::yield(); // stops the CPU for a bit to let the threads keep working before locking the task queue again
     }
 
     //diagnostic data
     auto end = std::chrono::steady_clock::now();
     double difference = std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
-    //std::cout << difference << "\n";
+    double frameTimeFPS = 1000 * deltaTime;
 
-    FPS = 1.0f / difference;
-    //std::cout << FPS << "\n";
-
+    FPS = 1000 / frameTimeFPS;
     // tell glut to draw - note this will cap this function at 60 fps
     glutPostRedisplay();
 }
@@ -572,7 +570,7 @@ int main(int argc, char** argv) {
                     //locks the task when started so two threads can't do same task
                     std::unique_lock<std::mutex> lock(queueMutex); //unique lock will auto unlock after task is done
 
-                    //thread will sleep until there is eithe ra task or the program closes
+                    //thread will sleep until there is either a task or the program closes
                     cv.wait(lock, [] { return stopThreads || !tasks.empty(); });
 
                     //thread can exit 
