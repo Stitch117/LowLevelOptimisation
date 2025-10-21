@@ -37,6 +37,9 @@ struct region
 {
     Vec3 minRegionX;
     Vec3 maxRegionx;
+
+    //vector of collider objects within the region
+    std::vector<ColliderObject*> regionColliders;
 };
 
 bool acceptedRegionCount = false;
@@ -45,8 +48,6 @@ int regionCount = 0;
 //vector of all the colliders
 std::vector<ColliderObject*> colliders;
 
-//vector of vectors containing the regions. allows dynamically setting amount of regions wanted 
-std::vector<std::vector<ColliderObject*>> regionColliders;
 int clickedBoxIndex = -1;
 
 std::vector<region> regions;
@@ -77,7 +78,7 @@ void generateRegions(int _regionCount)
         region r;
         r.minRegionX = Vec3(i * width + minX, FLOORY, minZ);
         r.maxRegionx = Vec3((i + 1) * width + minX, CIELINGY, maxZ);
-        regions.push_back(r);
+        regions[i] = r;
     }
 }
 
@@ -95,34 +96,32 @@ void organiseVectors(std::vector<ColliderObject*> _colliders)
         ColliderObject* obj = _colliders[i];
         const float x = obj->position.x;
 
+        //edge cases on the outside walls
+        if (x < regions[0].minRegionX.x)
+        {
+            regions[0].regionColliders.push_back(obj);
+        }
+        else if (x >= regions[regions.size() - 1].maxRegionx.x)
+        {
+            regions[regions.size() - 1].regionColliders.push_back(obj);
+        }
+
         //check if the x co-ordinate of the object is in a region and if so, add to it
         for (int r = 0; r < regions.size(); r++)
         {
-            //edge cases on the outside walls
-            if (x < regions[0].minRegionX.x)
-            {
-                regionColliders[0].push_back(obj);
-                break;
-            }
-            else if (x >= regions[regions.size() - 1].maxRegionx.x)
-            {
-                regionColliders[regions.size() - 1].push_back(obj); 
-                break;
-            }
-
             //internal collision checks
-            else if (x >= regions[r].minRegionX.x && x < regions[r].maxRegionx.x)
+            if (x >= regions[r].minRegionX.x && x < regions[r].maxRegionx.x)
             {
-                regionColliders[r].push_back(obj);
+                regions[r].regionColliders.push_back(obj);
 
                 //region checks for edges of boxes to make more accurate simulation on boundries of regions
                 if (x - HALF_OBJECT_LENGTH < regions[r].minRegionX.x && x > minX + HALF_OBJECT_LENGTH)
                 {
-                    regionColliders[r - 1].push_back(obj);
+                    regions[r - 1].regionColliders.push_back(obj);
                 }
                 if (x + HALF_OBJECT_LENGTH > regions[r].maxRegionx.x && x < maxX - HALF_OBJECT_LENGTH)
                 {
-                    regionColliders[r + 1].push_back(obj);
+                    regions[r + 1].regionColliders.push_back(obj);
                 }
 
                 break;
@@ -347,7 +346,7 @@ void idle() {
     //empty the regions of last frame
     for (int i = 0; i < regionCount; i++)
     {
-        regionColliders[i].clear();
+        regions[i].regionColliders.clear();
     }
 
     //assign each object ito the corresponsding physics region
@@ -358,7 +357,7 @@ void idle() {
         std::unique_lock<std::mutex> lock(queueMutex);
         for (int i = 0; i < regions.size(); i++)
         {
-            tasks.push([=]() { updatePhysics(deltaTime, regionColliders[i]); });
+            tasks.push([=]() { updatePhysics(deltaTime, regions[i].regionColliders); });
         }
     }
     
@@ -554,7 +553,11 @@ int main(int argc, char** argv) {
     }
 
     //create the regions
-    regionColliders.resize(regionCount);
+    regions.resize(regionCount);
+    for (int i = 0; i < regionCount; i++)
+    {
+        regions[i].regionColliders.resize(regionCount);
+    }
     generateRegions(regionCount);
 
     //create the thread pool
