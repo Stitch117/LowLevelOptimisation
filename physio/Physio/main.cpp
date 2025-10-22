@@ -19,6 +19,8 @@
 #include <condition_variable>
 #include <functional>
 
+//canary guard value
+static volatile uint64_t __myStackCheckGuard = 0xF0F0F0F0F0F0F0F0; 
 
 using namespace std::chrono;
 
@@ -63,13 +65,53 @@ float FPS = 0;
 int numOfBoxes = 0;
 int numOfSpheres = 0;
 
+//abort function for canary
+inline void myStackCheckFail() {
+    std::cout << "*** stack canary check failed ***\n";
+    std::abort();
+}
+
+//Canary check in each function
+struct CanaryGuard {
+    uint64_t localCanary;
+
+    //initialise a local canary on fucntion start
+    CanaryGuard() 
+    {
+        localCanary = __myStackCheckGuard;
+    }
+
+    //when local canaryGuard drops out of scope it will call this check
+    ~CanaryGuard() 
+    {
+        if (localCanary != __myStackCheckGuard) 
+        {
+            myStackCheckFail(); 
+        }
+    }
+};
+
+//canary check
+void CanaryDemo() {
+    CanaryGuard cg;
+
+    //corrupt the CanaryGuard's local value (for testing only)
+    *((uint64_t*)&cg) ^= 0x1111;
+}
+
+
+//used in printing memory data
 void printNumOfObjs()
 {
     std::cout << "Num of Boxes: " << numOfBoxes << " Num of Spheres: " << numOfSpheres << std::endl;
 }
+
+
 //create the amouint of regions requested, equally divided along the x axis
 void generateRegions(int _regionCount)
 {
+    CanaryGuard cg; // automatic, checked when function exits
+
     float width = (maxX - minX) / static_cast<float>(_regionCount); //width of each region
 
     //define a region bounding box with the minimum to the maximum
@@ -91,6 +133,8 @@ void generateMapTracker()
 //organise each object into its respetive region
 void organiseVectors(std::vector<ColliderObject*> _colliders)
 {
+    CanaryGuard cg; // automatic, checked when function exits
+
     for (int i = 0; i < _colliders.size(); i++)
     {
         ColliderObject* obj = _colliders[i];
@@ -230,7 +274,10 @@ bool rayBoxIntersection(const Vec3& rayOrigin, const Vec3& rayDirection, const C
 }
 
 // used in the 'mouse' tap function to convert a screen point to a point in the world
-Vec3 screenToWorld(int x, int y) {
+Vec3 screenToWorld(int x, int y) 
+{
+    CanaryGuard cg; // automatic, checked when function exits
+
     GLint viewport[4];
     GLdouble modelview[16];
     GLdouble projection[16];
@@ -254,9 +301,8 @@ Vec3 screenToWorld(int x, int y) {
 
 
 // update the physics: gravity, collision test, collision resolution
-void updatePhysics(const float deltaTime, std::vector<ColliderObject*> _colliders) {
-    OPTICK_THREAD();
-
+void updatePhysics(const float deltaTime, std::vector<ColliderObject*> _colliders) 
+{
     for (int i = 0; i < _colliders.size(); i++)
     {
         _colliders[i]->update(&_colliders, deltaTime);
@@ -266,7 +312,8 @@ void updatePhysics(const float deltaTime, std::vector<ColliderObject*> _collider
 
 // draw the sides of the containing area
 void drawQuad(const Vec3& v1, const Vec3& v2, const Vec3& v3, const Vec3& v4) {
-    
+    CanaryGuard cg; // automatic, checked when function exits
+
     glBegin(GL_QUADS);
     glVertex3f(v1.x, v1.y, v1.z);
     glVertex3f(v2.x, v2.y, v2.z);
@@ -503,6 +550,7 @@ void keyboard(unsigned char key, int x, int y) {
 
 // the main function. 
 int main(int argc, char** argv) {
+    CanaryGuard cg; // automatic, checked when function exits
 
     srand(static_cast<unsigned>(time(0))); // Seed random number generator
     glutInit(&argc, argv);
@@ -523,6 +571,9 @@ int main(int argc, char** argv) {
     generateMapTracker();
     BoxPool::Get(MAX_NUMBER_BOXES); 
     SpherePool::Get(MAX_NUMBER_SPHERES);
+
+    //check canaries
+    //CanaryDemo();
 
     //ask for anmount of regions
     while (acceptedRegionCount != true)
