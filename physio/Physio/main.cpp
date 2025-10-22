@@ -490,6 +490,7 @@ void keyboard(unsigned char key, int x, int y) {
             box->velocity.y += impulseMagnitude;
         }
     }
+    //print out current emmeory information
     else if (key == '0') 
     // 0
     { 
@@ -497,10 +498,18 @@ void keyboard(unsigned char key, int x, int y) {
         TrackerManager::PrintAll();
         printNumOfObjs();
     }
+    //current FPS count print
     else if (key == '9') { // 9
 
         std::cout << "Current FPS of physics: " << FPS << std::endl;
     }
+    else if (key == '8') { // 8
+
+        //check canaries
+        CanaryDemo(); 
+    }
+
+    //add 50 of each object if there is room in memory pool
     else if (key == '1') 
     // 1
     {
@@ -509,6 +518,8 @@ void keyboard(unsigned char key, int x, int y) {
             initScene(NUMBER_OF_BOXES, NUMBER_OF_SPHERES);
         }
     }
+
+    //remove 50 of each object if there is that many 
     else if (key == '2')// 2
     { 
         if (colliders.size() > 0)
@@ -571,9 +582,6 @@ int main(int argc, char** argv) {
     generateMapTracker();
     BoxPool::Get(MAX_NUMBER_BOXES); 
     SpherePool::Get(MAX_NUMBER_SPHERES);
-
-    //check canaries
-    //CanaryDemo();
 
     //ask for anmount of regions
     while (acceptedRegionCount != true)

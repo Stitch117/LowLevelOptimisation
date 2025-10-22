@@ -15,6 +15,6 @@ C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimis
   (compiling source file 'main.cpp')
   
 C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(428,16): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(516,29): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(591,29): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(527,29): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\Physio\main.cpp(600,29): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
   Physio.vcxproj -> C:\Users\james\Documents\Documents\University work\Year 2\COLLAB\LowLevelOptimisation\physio\x64\Debug\Physio.exe
