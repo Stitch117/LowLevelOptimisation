@@ -383,8 +383,11 @@ void display() {
 void idle() {
     OPTICK_FRAME("update");
 
+    //FPS check
     static auto last = steady_clock::now();
     auto old = last;
+
+    //delta time creation
     last = steady_clock::now();
     const duration<float> frameTime = last - old;
     float deltaTime = frameTime.count();
@@ -404,6 +407,10 @@ void idle() {
         std::unique_lock<std::mutex> lock(queueMutex);
         for (int i = 0; i < regions.size(); i++)
         {
+            for (int j = 0; j < regions[i].regionColliders.size(); j++)
+            {
+                regions[i].regionColliders[j]->colour = Vec3(i / 10.0f, i / 10.0f, i / 10.0f);
+            }
             tasks.push([=]() { updatePhysics(deltaTime, regions[i].regionColliders); });
         }
     }
