@@ -1,7 +1,2 @@
-﻿  Box.cpp
-  ColliderObject.cpp
-  Sphere.cpp
-  main.cpp
-  Generating Code...
-  LINK : C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\x64\Debug\Physio.exe not found or not built by the last incremental link; performing full link
+﻿  main.cpp
   Physio.vcxproj -> C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\x64\Debug\Physio.exe

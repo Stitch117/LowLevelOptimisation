@@ -30,7 +30,7 @@ using namespace std::chrono;
 
 
 
-
+double FPS;
 
 std::vector<ColliderObject*> colliders;
 int clickedBoxIndex = -1;
@@ -230,6 +230,9 @@ void display() {
 // see https://www.opengl.org/resources/libraries/glut/spec3/node63.html#:~:text=glutIdleFunc
 // NOTE this may be capped at 60 fps as we are using glutPostRedisplay(). If you want it to go higher than this, maybe a thread will help here. 
 void idle() {
+    //FPS
+    static auto start = steady_clock::now();
+
     static auto last = steady_clock::now();
     auto old = last;
     last = steady_clock::now();
@@ -237,6 +240,11 @@ void idle() {
     float deltaTime = frameTime.count();
 
     updatePhysics(deltaTime);
+
+    static auto end = steady_clock::now();
+    double frameTimeFPS = 1000 * deltaTime;
+
+    FPS = 1000 / frameTimeFPS;
 
     // tell glut to draw - note this will cap this function at 60 fps
     glutPostRedisplay();
@@ -295,9 +303,9 @@ void keyboard(unsigned char key, int x, int y) {
             box->velocity.y += impulseMagnitude;
         }
     }
-    else if (key == '0') { // 1
+    else if (key == '9') { // 1
 
-        std::cout << "Memory used" << std::endl;
+        std::cout << "FPS of simulation: " << FPS << std::endl;
     }
     else if (key == '1') { // 1
 
