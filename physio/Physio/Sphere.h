@@ -41,6 +41,10 @@ public:
 		free(pHeader);
 	}
 
+	Sphere()
+	{
+		ColliderTypeInt = ColliderType::SphereCollider;
+	}
 
     void drawMesh() { glutSolidSphere(0.5, 5, 5); }
 }; 

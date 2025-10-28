@@ -43,6 +43,11 @@ public:
 		free(pHeader);
 	}
 
+	Box()
+	{
+		ColliderTypeInt = ColliderType::BoxCollider;
+	}
+
 	void drawMesh() { glutSolidCube(1.0); }
 };
 
