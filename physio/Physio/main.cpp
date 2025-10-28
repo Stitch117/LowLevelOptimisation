@@ -29,7 +29,7 @@ using namespace std::chrono;
 #define LOOKDIR_Z 0
 
 
-
+double FPS;
 
 
 std::vector<ColliderObject*> colliders;
@@ -222,7 +222,7 @@ Vec3 screenToWorld(int x, int y) {
 
 
 // update the physics: gravity, collision test, collision resolution
-void updatePhysics(const float deltaTime, std::vector<ColliderObject*> _colliders) {
+void updatePhysics(const float deltaTime, std::vector<ColliderObject*> _colliders, int _threadnumber) {
     
     // todo for the assessment - use a thread for each sub region
     // for example, assuming we have two regions:
@@ -233,6 +233,21 @@ void updatePhysics(const float deltaTime, std::vector<ColliderObject*> _collider
 
     for (int i = 0; i < _colliders.size(); i++)
     {
+        switch(_threadnumber)
+        {
+            case 1:
+                _colliders[i]->colour = Vec3(1.0f, 0.0f, 0.0f);
+                break;
+            case 2:
+                _colliders[i]->colour = Vec3(0.0f, 1.0f, 0.0f);
+                break;
+            case 3:
+                _colliders[i]->colour = Vec3(0.0f, 0.0f, 1.0f);
+                break;
+            case 4:
+                _colliders[i]->colour = Vec3(1.0f, 0.0f, 1.0f);
+                break;
+        }
         _colliders[i]->update(&_colliders, deltaTime);
         
     }
@@ -308,12 +323,13 @@ void display() {
 // see https://www.opengl.org/resources/libraries/glut/spec3/node63.html#:~:text=glutIdleFunc
 // NOTE this may be capped at 60 fps as we are using glutPostRedisplay(). If you want it to go higher than this, maybe a thread will help here. 
 void idle() {
+    auto start = std::chrono::steady_clock::now();
+
     static auto last = steady_clock::now();
     auto old = last;
     last = steady_clock::now();
     const duration<float> frameTime = last - old;
     float deltaTime = frameTime.count();
-    auto start = std::chrono::steady_clock::now();
 
     std::thread threadSort1(organiseVectors, colliders, 1);
     std::thread threadSort2(organiseVectors, colliders, 2);
@@ -321,10 +337,10 @@ void idle() {
     threadSort1.join();
     threadSort2.join();
 
-    std::thread threadLeftBack(updatePhysics, deltaTime, LeftBackcolliders);
-    std::thread threadRightBack(updatePhysics, deltaTime, RightBackcolliders);
-    std::thread threadLeftFront(updatePhysics, deltaTime, LeftFrontcolliders);
-    std::thread threadRightFront(updatePhysics, deltaTime, RightFrontcolliders);
+    std::thread threadLeftBack(updatePhysics, deltaTime, LeftBackcolliders, 1);
+    std::thread threadRightBack(updatePhysics, deltaTime, RightBackcolliders, 2);
+    std::thread threadLeftFront(updatePhysics, deltaTime, LeftFrontcolliders, 3);
+    std::thread threadRightFront(updatePhysics, deltaTime, RightFrontcolliders, 4);
 
     threadLeftBack.join();
     threadRightBack.join();
@@ -338,10 +354,12 @@ void idle() {
 
     auto end = std::chrono::steady_clock::now();
     double difference = std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
-    std::cout << difference << "\n";
+    //std::cout << difference << "\n";
 
-    float FPS = 1.0f / difference;
-    std::cout << FPS << "\n";
+    double frameTimeFPS = 1000 * deltaTime;
+
+    FPS = 1000 / frameTimeFPS;
+    //std::cout << FPS << "\n";
 
     // tell glut to draw - note this will cap this function at 60 fps
     glutPostRedisplay();
@@ -400,9 +418,9 @@ void keyboard(unsigned char key, int x, int y) {
             box->velocity.y += impulseMagnitude;
         }
     }
-    else if (key == '0') { // 1
+    else if (key == '9') { // 1
 
-        std::cout << "Memory used" << std::endl;
+        std::cout << "FPS of simulation: " << FPS << std::endl;
     }
     else if (key == '1') { // 1
 
