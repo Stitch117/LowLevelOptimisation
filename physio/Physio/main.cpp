@@ -61,6 +61,7 @@ std::mutex queueMutex; //used to lock tasks so only one thread can access it
 std::condition_variable cv; 
 bool stopThreads = false;
 
+double FPS;
 
 //create the amouint of regions requested, equally divided along the x axis
 void generateRegions(int _regionCount)
@@ -315,13 +316,13 @@ void display() {
 // NOTE this may be capped at 60 fps as we are using glutPostRedisplay(). If you want it to go higher than this, maybe a thread will help here. 
 void idle() {
     OPTICK_FRAME("update");
+    auto start = std::chrono::steady_clock::now();
 
     static auto last = steady_clock::now();
     auto old = last;
     last = steady_clock::now();
     const duration<float> frameTime = last - old;
     float deltaTime = frameTime.count();
-    auto start = std::chrono::steady_clock::now();
 
     //empty the regions of last frame
     for (int i = 0; i < regionCount; i++)
@@ -356,10 +357,10 @@ void idle() {
     //diagnostic data
     auto end = std::chrono::steady_clock::now();
     double difference = std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
-    std::cout << difference << "\n";
+    //std::cout << difference << "\n";
 
-    float FPS = 1.0f / difference;
-    std::cout << FPS << "\n";
+    double timeFrameFPS = deltaTime * 1000;
+    FPS = 1000.0f / timeFrameFPS;
 
     // tell glut to draw - note this will cap this function at 60 fps
     glutPostRedisplay();
@@ -418,9 +419,9 @@ void keyboard(unsigned char key, int x, int y) {
             box->velocity.y += impulseMagnitude;
         }
     }
-    else if (key == '0') { // 1
+    else if (key == '9') { // 1
 
-        std::cout << "Memory used" << std::endl;
+        std::cout << "FPS of simulation: " << FPS << std::endl;
     }
     else if (key == '1') { // 1
 
