@@ -32,7 +32,7 @@ using namespace std::chrono;
 #define LOOKDIR_Z 0
 
 
-
+double FPS;
 
 
 std::list<ColliderObject*> colliders;
@@ -226,6 +226,10 @@ void display() {
 // see https://www.opengl.org/resources/libraries/glut/spec3/node63.html#:~:text=glutIdleFunc
 // NOTE this may be capped at 60 fps as we are using glutPostRedisplay(). If you want it to go higher than this, maybe a thread will help here. 
 void idle() {
+
+    //FPS DATA 
+    auto start = steady_clock::now();
+
     static auto last = steady_clock::now();
     auto old = last;
     last = steady_clock::now();
@@ -233,6 +237,15 @@ void idle() {
     float deltaTime = frameTime.count();
 
     updatePhysics(deltaTime);
+
+    //FPS DATA
+    auto end = steady_clock::now();
+
+    double difference = std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
+    //std::cout << difference << "\n";
+
+    FPS = difference;
+    FPS = 1.0f / difference;
 
     // tell glut to draw - note this will cap this function at 60 fps
     glutPostRedisplay();
@@ -289,7 +302,7 @@ void keyboard(unsigned char key, int x, int y) {
     }
     else if (key == '1') { // 1
 
-        std::cout << "Memory used" << std::endl;
+        std::cout << "FPS for simulation: " << FPS << std::endl;
     }
 }
 
