@@ -417,6 +417,14 @@ void mouse(int button, int state, int x, int y) {
         // Remove the clicked box if any
         if (clickedBoxOK != false) 
         {
+            if (colliders[clickedBoxIndex]->ColliderTypeInt == ColliderObject::ColliderType::BoxCollider)
+            {
+                numOfBoxes--;
+            }
+            else if (colliders[clickedBoxIndex]->ColliderTypeInt == ColliderObject::ColliderType::SphereCollider)
+            {
+                numOfSpheres--;
+            }
             delete(colliders[clickedBoxIndex]);
             colliders.erase(colliders.begin() + clickedBoxIndex);
         }
