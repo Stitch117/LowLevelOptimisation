@@ -244,8 +244,8 @@ void idle() {
     double difference = std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
     //std::cout << difference << "\n";
 
-    FPS = difference;
-    FPS = 1.0f / difference;
+    double frameTimeFPS = deltaTime * 1000;
+    FPS = 1000.0f / frameTimeFPS;
 
     // tell glut to draw - note this will cap this function at 60 fps
     glutPostRedisplay();
@@ -300,9 +300,17 @@ void keyboard(unsigned char key, int x, int y) {
             box->velocity.y += impulseMagnitude;
         }
     }
-    else if (key == '1') { // 1
+    else if (key == '9') { // 1
 
         std::cout << "FPS for simulation: " << FPS << std::endl;
+    }
+    //add 50 of each object if there is room in memory pool
+    else if (key == '1')
+        // 1
+    {
+
+        initScene(NUMBER_OF_BOXES, NUMBER_OF_SPHERES);
+        
     }
 }
 
