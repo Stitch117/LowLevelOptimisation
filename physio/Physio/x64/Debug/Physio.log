@@ -1,11 +1,7 @@
-﻿  Box.cpp
-  ColliderObject.cpp
-  main.cpp
+﻿  main.cpp
 C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\Physio\main.cpp(231,5): warning C4003: not enough arguments for function-like macro invocation 'OPTICK_THREAD'
 C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\Physio\main.cpp(231,5): warning C4551: function call missing argument list
 C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\Physio\main.cpp(231,5): warning C4930: 'Optick::ThreadScope brofilerThreadScope(void)': prototyped function not called (was a variable definition intended?)
-C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\Physio\main.cpp(466,29): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-  Sphere.cpp
-  Vec3.cpp
-  Generating Code...
+C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\Physio\main.cpp(467,29): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  LINK : C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\x64\Debug\Physio.exe not found or not built by the last incremental link; performing full link
   Physio.vcxproj -> C:\Users\p010621n\Documents\GitHub\LowLevelOptimisation\physio\x64\Debug\Physio.exe
