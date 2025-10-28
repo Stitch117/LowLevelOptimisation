@@ -13,6 +13,14 @@ public:
     Vec3 velocity;
     Vec3 colour;
 
+    enum ColliderType
+    {
+        SphereCollider,
+        BoxCollider
+    };
+
+    int ColliderTypeInt;
+
     virtual ~ColliderObject();
 
     // if two colliders collide, push them away from each other
