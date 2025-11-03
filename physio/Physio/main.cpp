@@ -547,9 +547,10 @@ void keyboard(unsigned char key, int x, int y) {
                     colliders.pop_back();
                     delete(obj);
                 }
-                numOfBoxes = 0;
+                //tracker data
+                /*numOfBoxes = 0;
                 numOfSpheres = 0;
-                std::cout << "\nAfter removing all remainin objects:\n";
+                std::cout << "\nAfter removing all remainin objects:\n";*/
             }
             else
             {
@@ -560,12 +561,14 @@ void keyboard(unsigned char key, int x, int y) {
                     colliders.pop_back();
                     delete(obj);
                 }
-                numOfBoxes -= NUMBER_OF_BOXES;
-                numOfSpheres -= NUMBER_OF_SPHERES;
-                std::cout << "\nAfter deleting " << NUMBER_OF_BOXES << " boxes and " << NUMBER_OF_SPHERES << " spheres:\n";
+                //tracker data
+                //numOfBoxes -= NUMBER_OF_BOXES;
+                //numOfSpheres -= NUMBER_OF_SPHERES;
+                //std::cout << "\nAfter deleting " << NUMBER_OF_BOXES << " boxes and " << NUMBER_OF_SPHERES << " spheres:\n";
             }
-            TrackerManager::PrintAll(); 
-            printNumOfObjs();
+            //tracker data
+            /*TrackerManager::PrintAll(); 
+            printNumOfObjs();*/
         }
     }
 }
