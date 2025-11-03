@@ -372,8 +372,8 @@ void idle() {
     auto end = std::chrono::steady_clock::now();
     double difference = std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
     //std::cout << difference << "\n";
-
-    FPS = 1.0f / difference;
+    double frametimeFPS = deltaTime * 1000;
+    FPS = 1000 / frametimeFPS;
     //std::cout << FPS << "\n";
 
     // tell glut to draw - note this will cap this function at 60 fps
