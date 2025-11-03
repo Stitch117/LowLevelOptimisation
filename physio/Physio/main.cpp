@@ -336,8 +336,11 @@ void display() {
 void idle() {
     OPTICK_FRAME("update");
 
+    //FPS check
     static auto last = steady_clock::now();
     auto old = last;
+
+    //delta time creation
     last = steady_clock::now();
     const duration<float> frameTime = last - old;
     float deltaTime = frameTime.count();
