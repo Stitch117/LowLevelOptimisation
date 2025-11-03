@@ -46,6 +46,8 @@ struct region
 
 bool acceptedRegionCount = false;
 int regionCount = 0;
+bool acceptedthreadCount = false;
+int threadCount = 0;
 
 //vector of all the colliders
 std::vector<ColliderObject*> colliders;
@@ -178,9 +180,9 @@ void organiseVectors(std::vector<ColliderObject*> _colliders)
 
 void initScene(int boxCount, int sphereCount) 
 {
-    std::cout << "\nBefore any allocation:\n";
+    /*std::cout << "\nBefore any allocation:\n";
     TrackerManager::PrintAll();
-    printNumOfObjs();
+    printNumOfObjs();*/
 
     for (int i = 0; i < boxCount; ++i) 
     {
@@ -618,6 +620,26 @@ int main(int argc, char** argv) {
         }
     }
 
+    //input the thread count
+    while (acceptedthreadCount != true)
+    {
+        std::cout << "How many threads are wanted, input a positive integer\n";
+        std::cin >> threadCount;
+        if (threadCount < 1)
+        {
+            std::cout << "must be a minimum of 1\n";
+        }
+        else if (ceil(threadCount) == floor(threadCount))
+        {
+            std::cout << "Accempted number of threads\n";
+            acceptedthreadCount = true;
+        }
+        else
+        {
+            std::cout << "Not a float input, please try again\n";
+        }
+
+    }
     //create the regions
     regions.resize(regionCount);
     for (int i = 0; i < regionCount; i++)
@@ -627,7 +649,7 @@ int main(int argc, char** argv) {
     generateRegions(regionCount);
 
     //create the thread pool
-    for (int i = 0; i < regionCount; i++) //One thread per region
+    for (int i = 0; i < threadCount; i++) //One thread per region
     {
         //lamda function so it can run any task
         workers.emplace_back([]() {
