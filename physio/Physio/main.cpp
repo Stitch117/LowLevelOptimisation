@@ -207,9 +207,10 @@ void initScene(int boxCount, int sphereCount)
         numOfBoxes++;
     }
 
-    std::cout << "\nafter box allocation:\n";
-    TrackerManager::PrintAll(); 
-    printNumOfObjs();
+    //memory tracker couts
+    //std::cout << "\nafter box allocation:\n";
+    //TrackerManager::PrintAll(); 
+    //printNumOfObjs();
 
     for (int i = 0; i < sphereCount; ++i) 
     {
@@ -236,9 +237,10 @@ void initScene(int boxCount, int sphereCount)
         numOfSpheres++;
     }
 
-    std::cout << "\nafter sphere allocation:\n";
-    TrackerManager::PrintAll();
-    printNumOfObjs();
+    //memory tracker couts
+    //std::cout << "\nafter sphere allocation:\n";
+    //TrackerManager::PrintAll();
+    //printNumOfObjs();
 }
 
 // a ray which is used to tap (by default, remove) a box - see the 'mouse' function for how this is used.
