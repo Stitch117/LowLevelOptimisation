@@ -20,6 +20,7 @@ public:
     };
 
     int ColliderTypeInt = -1;
+    bool PhysicsSolved = false;
 
     virtual ~ColliderObject();
 
@@ -81,6 +82,7 @@ public:
 
     void update(std::vector<ColliderObject*>* colliders, const float& deltaTime)
     {
+        PhysicsSolved = true;
         // Update velocity due to gravity
         velocity.y += gravity * deltaTime;
 

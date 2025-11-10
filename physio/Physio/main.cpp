@@ -135,12 +135,13 @@ void generateMapTracker()
 //organise each object into its respetive region
 void organiseVectors(std::vector<ColliderObject*> _colliders)
 {
-    CanaryGuard cg; // automatic, checked when function exits
+    CanaryGuard cg; // automaticly checked when function exits
 
     for (int i = 0; i < _colliders.size(); i++)
     {
         ColliderObject* obj = _colliders[i];
         const float x = obj->position.x;
+        obj->PhysicsSolved = false;
 
         //edge cases on the outside walls
         if (x < regions[0].minRegionX.x)
@@ -309,8 +310,10 @@ void updatePhysics(const float deltaTime, std::vector<ColliderObject*> _collider
 {
     for (int i = 0; i < _colliders.size(); i++)
     {
+        if (_colliders[i]->PhysicsSolved == false)
+        {
         _colliders[i]->update(&_colliders, deltaTime);
-        
+        }
     }
 }
 
