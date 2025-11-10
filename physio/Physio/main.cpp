@@ -416,7 +416,7 @@ void idle() {
         {
             for (int j = 0; j < regions[i].regionColliders.size(); j++)
             {
-                regions[i].regionColliders[j]->colour = Vec3(i / 10.0f, i / 10.0f, i / 10.0f);
+                regions[i].regionColliders[j]->colour = Vec3(i * (1.0f/(regions.size()-1)), i * (1.0f / (regions.size() - 1)), i * (1.0f / (regions.size() - 1)));
             }
             tasks.push([=]() { updatePhysics(deltaTime, regions[i].regionColliders); });
         }
