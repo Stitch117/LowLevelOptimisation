@@ -68,14 +68,16 @@ int numOfBoxes = 0;
 int numOfSpheres = 0;
 
 //abort function for canary
-inline void myStackCheckFail() {
+inline void myStackCheckFail(std::string _functionName) {
     std::cout << "*** stack canary check failed ***\n";
+    std::cout << "function failed at: " << _functionName;
     std::abort();
 }
 
 //Canary check in each function
 struct CanaryGuard {
     uint64_t localCanary;
+    std::string functionName;
 
     //initialise a local canary on fucntion start
     CanaryGuard() 
@@ -88,7 +90,7 @@ struct CanaryGuard {
     {
         if (localCanary != __myStackCheckGuard) 
         {
-            myStackCheckFail(); 
+            myStackCheckFail(functionName); 
         }
     }
 };
@@ -96,6 +98,7 @@ struct CanaryGuard {
 //canary check
 void CanaryDemo() {
     CanaryGuard cg;
+    cg.functionName = "CanaryDemo";
 
     //corrupt the CanaryGuard's local value (for testing only)
     *((uint64_t*)&cg) ^= 0x1111;
@@ -136,6 +139,7 @@ void generateMapTracker()
 void organiseVectors(std::vector<ColliderObject*> _colliders)
 {
     CanaryGuard cg; // automaticly checked when function exits
+    cg.functionName = "organiseVectors";
 
     for (int i = 0; i < _colliders.size(); i++)
     {
@@ -282,6 +286,7 @@ bool rayBoxIntersection(const Vec3& rayOrigin, const Vec3& rayDirection, const C
 Vec3 screenToWorld(int x, int y) 
 {
     CanaryGuard cg; // automatic, checked when function exits
+    cg.functionName = "screenToWorld";
 
     GLint viewport[4];
     GLdouble modelview[16];
@@ -320,6 +325,7 @@ void updatePhysics(const float deltaTime, std::vector<ColliderObject*> _collider
 // draw the sides of the containing area
 void drawQuad(const Vec3& v1, const Vec3& v2, const Vec3& v3, const Vec3& v4) {
     CanaryGuard cg; // automatic, checked when function exits
+    cg.functionName = "drawQuad";
 
     glBegin(GL_QUADS);
     glVertex3f(v1.x, v1.y, v1.z);
@@ -579,6 +585,7 @@ void keyboard(unsigned char key, int x, int y) {
 // the main function. 
 int main(int argc, char** argv) {
     CanaryGuard cg; // automatic, checked when function exits
+    cg.functionName = "main";
 
     srand(static_cast<unsigned>(time(0))); // Seed random number generator
     glutInit(&argc, argv);
